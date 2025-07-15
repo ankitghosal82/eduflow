@@ -1,98 +1,107 @@
 "use client"
 
-import { useState, useEffect, createContext, useContext, type ReactNode } from "react"
+import type React from "react"
 
-// Define the shape of our translation object
-type Translation = Record<string, string>
+import { createContext, useContext, useState, useEffect, useCallback } from "react"
 
-// Define the shape of the context value
-interface LanguageContextType {
-  lang: string
-  setLanguage: (newLang: string) => void
-  t: (key: string, replacements?: Record<string, string | number>) => string
-}
-
-// Create the context
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
-
-// --- static JSON imports (Next.js handles these automatically) ---
+// Import all locale files
 import en from "./locales/en.json"
+import es from "./locales/es.json"
 import bn from "./locales/bn.json"
 import hi from "./locales/hi.json"
-import es from "./locales/es.json"
-import mr from "./locales/mr.json"
 import gu from "./locales/gu.json"
+import mr from "./locales/mr.json"
 import pa from "./locales/pa.json"
 
-const languages: Record<string, Translation> = {
+type Locale = typeof en | typeof es | typeof bn | typeof hi | typeof gu | typeof mr | typeof pa
+
+const locales: Record<string, Locale> = {
   en,
+  es,
   bn,
   hi,
-  es,
-  mr,
   gu,
+  mr,
   pa,
 }
 
-export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [lang, setLang] = useState<string>("en")
-  const [translations, setTranslations] = useState<Translation>({})
+export const supportedLanguages = [
+  { code: "en", name: "English" },
+  { code: "es", name: "Español" },
+  { code: "bn", name: "বাংলা" },
+  { code: "hi", name: "हिन्दी" },
+  { code: "gu", name: "ગુજરાતી" },
+  { code: "mr", name: "मराठी" },
+  { code: "pa", name: "ਪੰਜਾਬੀ" },
+]
+
+interface LanguageContextType {
+  language: string
+  setLanguage: (lang: string) => void
+  t: (key: string, params?: Record<string, string | number>) => string
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
+
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const [language, setLanguageState] = useState<string>("en")
+  const [translations, setTranslations] = useState<Locale>(locales.en)
 
   useEffect(() => {
-    // Load language from localStorage on mount
-    const savedLang = localStorage.getItem("selectedLanguage") ?? "en"
-    if (languages[savedLang]) {
-      setLang(savedLang)
-      setTranslations(languages[savedLang])
+    // Attempt to load language from localStorage
+    const storedLang = localStorage.getItem("selectedLanguage")
+    if (storedLang && locales[storedLang]) {
+      setLanguageState(storedLang)
+      setTranslations(locales[storedLang])
     } else {
-      setLang("en")
-      setTranslations(languages.en)
+      // Fallback to browser language or default to English
+      const browserLang = navigator.language.split("-")[0]
+      if (locales[browserLang]) {
+        setLanguageState(browserLang)
+        setTranslations(locales[browserLang])
+        localStorage.setItem("selectedLanguage", browserLang)
+      } else {
+        setLanguageState("en")
+        setTranslations(locales.en)
+        localStorage.setItem("selectedLanguage", "en")
+      }
+    }
+  }, [])
+
+  const setLanguage = useCallback((lang: string) => {
+    if (locales[lang]) {
+      setLanguageState(lang)
+      setTranslations(locales[lang])
+      localStorage.setItem("selectedLanguage", lang)
+    } else {
+      console.warn(`Language "${lang}" not supported. Falling back to English.`)
+      setLanguageState("en")
+      setTranslations(locales.en)
       localStorage.setItem("selectedLanguage", "en")
     }
   }, [])
 
-  const setLanguage = (newLang: string) => {
-    if (languages[newLang]) {
-      setLang(newLang)
-      setTranslations(languages[newLang])
-      localStorage.setItem("selectedLanguage", newLang)
-    } else {
-      console.warn(`Language ${newLang} not supported. Falling back to English.`)
-      setLang("en")
-      setTranslations(languages.en)
-      localStorage.setItem("selectedLanguage", "en")
-    }
-  }
+  const t = useCallback(
+    (key: string, params?: Record<string, string | number>): string => {
+      let translatedText = (translations as any)[key] || key
 
-  const t = (key: string, replacements?: Record<string, string | number>): string => {
-    let translatedString = translations[key] || key // Fallback to key if not found
-
-    if (replacements) {
-      for (const [placeholder, value] of Object.entries(replacements)) {
-        translatedString = translatedString.replace(new RegExp(`\\{\\{${placeholder}\\}\\}`, "g"), String(value))
+      if (params) {
+        for (const [paramKey, paramValue] of Object.entries(params)) {
+          translatedText = translatedText.replace(new RegExp(`{{${paramKey}}}`, "g"), String(paramValue))
+        }
       }
-    }
-    return translatedString
-  }
+      return translatedText
+    },
+    [translations],
+  )
 
-  return <LanguageContext.Provider value={{ lang, setLanguage, t }}>{children}</LanguageContext.Provider>
+  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>
 }
 
-export const useTranslation = () => {
+export function useTranslation() {
   const context = useContext(LanguageContext)
   if (context === undefined) {
     throw new Error("useTranslation must be used within a LanguageProvider")
   }
   return context
 }
-
-// Export supported languages for the selector
-export const supportedLanguages = [
-  { code: "en", name: "English" },
-  { code: "bn", name: "বাংলা (Bengali)" },
-  { code: "hi", name: "हिंदी (Hindi)" },
-  { code: "es", name: "Español (Spanish)" },
-  { code: "mr", name: "मराठी (Marathi)" },
-  { code: "gu", name: "ગુજરાતી (Gujarati)" },
-  { code: "pa", name: "ਪੰਜਾਬੀ (Punjabi)" },
-]

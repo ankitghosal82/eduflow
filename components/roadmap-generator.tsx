@@ -1,131 +1,85 @@
 "use client"
 
 import { useState } from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import type { Topic, CourseItem } from "@/lib/data"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown, CalendarDays } from "lucide-react"
-import Link from "next/link"
-import { useTranslation } from "@/lib/i18n/use-translation" // Add this import
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Sparkles, Loader2 } from "lucide-react"
 
-interface RoadmapGeneratorProps {
-  selectedTopic: Topic | undefined
-}
+export function RoadmapGenerator() {
+  const [topic, setTopic] = useState("")
+  const [roadmap, setRoadmap] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-interface DailyPlan {
-  day: number
-  items: CourseItem[]
-}
+  const handleGenerateRoadmap = async () => {
+    setIsLoading(true)
+    setError(null)
+    setRoadmap("")
 
-export default function RoadmapGenerator({ selectedTopic }: RoadmapGeneratorProps) {
-  const [duration, setDuration] = useState<number | undefined>(undefined)
-  const [roadmap, setRoadmap] = useState<DailyPlan[] | null>(null)
-  const [loading, setLoading] = useState(false)
-  const { t } = useTranslation() // Use translation hook
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2500))
 
-  const generateRoadmap = () => {
-    if (!selectedTopic || !duration) {
-      alert(t("alert_select_topic_duration")) // Translated alert
-      return
-    }
-
-    setLoading(true)
-    const totalItems = selectedTopic.items.length
-    const itemsPerDay = Math.ceil(totalItems / duration) // Distribute items as evenly as possible
-
-    const newRoadmap: DailyPlan[] = []
-    let itemIndex = 0
-
-    for (let day = 1; day <= duration; day++) {
-      const dailyItems: CourseItem[] = []
-      for (let i = 0; i < itemsPerDay && itemIndex < totalItems; i++) {
-        dailyItems.push(selectedTopic.items[itemIndex])
-        itemIndex++
+      if (topic.toLowerCase().includes("fail")) {
+        throw new Error("Roadmap generation failed. Try a different topic.")
       }
-      newRoadmap.push({ day, items: dailyItems })
-    }
 
-    // If there are remaining items due to rounding, add them to the last day
-    while (itemIndex < totalItems) {
-      newRoadmap[newRoadmap.length - 1].items.push(selectedTopic.items[itemIndex])
-      itemIndex++
+      const dummyRoadmap = `Detailed roadmap for "${topic}":\n\nPhase 1: Fundamentals\n- Understand basic concepts\n- Key terminology\n\nPhase 2: Intermediate Skills\n- Practical applications\n- Common patterns\n\nPhase 3: Advanced Topics\n- Deep dive into complex areas\n- Best practices\n\nPhase 4: Project Work\n- Build a portfolio project\n- Review and refine`
+      setRoadmap(dummyRoadmap)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setIsLoading(false)
     }
-
-    setTimeout(() => {
-      setRoadmap(newRoadmap)
-      setLoading(false)
-    }, 700) // Simulate a short loading time
   }
 
   return (
-    <Card className="w-full bg-gray-800 text-gray-100 border-gray-700 shadow-xl">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-purple-400">{t("roadmap_title")}</CardTitle>
-        <CardDescription className="text-gray-300">{t("roadmap_description")}</CardDescription>
+    <Card className="w-full max-w-2xl mx-auto bg-gray-800 text-gray-100 border-gray-700 shadow-lg">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-green-400 flex items-center gap-2">
+          <Sparkles className="h-6 w-6" /> Roadmap Generator
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Select onValueChange={(value) => setDuration(Number(value))} value={duration?.toString()}>
-            <SelectTrigger className="w-full sm:w-[180px] bg-gray-700 border-gray-600 text-gray-100 placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500">
-              <SelectValue placeholder={t("select_duration")} />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-800 text-gray-100 border-gray-700">
-              <SelectItem value="15">{t("days_15")}</SelectItem>
-              <SelectItem value="30">{t("days_30")}</SelectItem>
-              <SelectItem value="60">{t("days_60")}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            onClick={generateRoadmap}
-            disabled={loading || !selectedTopic || !duration}
-            className="w-full sm:w-auto bg-purple-600 hover:bg-purple-500 text-white"
-          >
-            {loading ? t("generating") : t("generate_roadmap")}
-          </Button>
+      <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <label htmlFor="topic" className="text-gray-300">
+            Enter the topic for your roadmap:
+          </label>
+          <Input
+            id="topic"
+            placeholder="e.g., Full-stack Development, Machine Learning"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            className="bg-gray-700 border-gray-600 text-gray-100 focus:border-green-500"
+          />
         </div>
-
-        {roadmap && roadmap.length > 0 && (
-          <div className="mt-6 space-y-4 max-h-[400px] overflow-y-auto pr-2">
-            <h3 className="text-xl font-semibold text-green-400 text-center">
-              {t("roadmap_for", { topicName: selectedTopic?.name || "", duration: duration || "" })}
-            </h3>
-            {roadmap.map((dayPlan) => (
-              <Card key={dayPlan.day} className="bg-gray-700 border-gray-600">
-                <Collapsible defaultOpen={dayPlan.items.length > 0}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                      <CalendarDays className="h-5 w-5 text-gray-400" /> {t("day", { dayNumber: dayPlan.day })}
-                    </CardTitle>
-                    <CollapsibleTrigger asChild>
-                      <ChevronDown className="h-5 w-5 text-gray-400 transition-transform data-[state=open]:rotate-180" />
-                    </CollapsibleTrigger>
-                  </CardHeader>
-                  <CollapsibleContent>
-                    <CardContent className="pt-2 space-y-2">
-                      {dayPlan.items.length > 0 ? (
-                        dayPlan.items.map((item) => (
-                          <div key={item.id} className="flex items-center gap-2 text-sm text-gray-300">
-                            <span className="h-2 w-2 rounded-full bg-purple-400" />
-                            <Link
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:underline text-purple-300 hover:text-purple-200"
-                            >
-                              {item.title} ({item.type})
-                            </Link>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-400 text-sm italic">{t("no_items_planned")}</p>
-                      )}
-                    </CardContent>
-                  </CollapsibleContent>
-                </Collapsible>
-              </Card>
-            ))}
+        <Button
+          onClick={handleGenerateRoadmap}
+          disabled={isLoading || !topic.trim()}
+          className="w-full bg-green-600 hover:bg-green-500 text-white py-2"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" /> Generate Roadmap
+            </>
+          )}
+        </Button>
+        {error && <div className="text-red-400 text-sm text-center">{error}</div>}
+        {roadmap && (
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-green-300">Generated Roadmap:</h3>
+            <Textarea
+              value={roadmap}
+              readOnly
+              rows={10}
+              className="bg-gray-700 border-gray-600 text-gray-100 font-mono resize-none"
+            />
           </div>
         )}
       </CardContent>

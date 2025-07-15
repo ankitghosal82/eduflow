@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 
-type SetValue<T> = (value: T | ((prevValue: T) => T)) => void
+type SetValue<T> = (value: T | ((val: T) => T)) => void
 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, SetValue<T>] {
   // State to store our value
@@ -18,19 +18,19 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, SetValue<T
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
       // If error also return initialValue
-      console.error("Error reading from localStorage:", error)
+      console.error(error)
       return initialValue
     }
   })
 
   // useEffect to update local storage when the state changes
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
+    try {
+      if (typeof window !== "undefined") {
         window.localStorage.setItem(key, JSON.stringify(storedValue))
-      } catch (error) {
-        console.error("Error writing to localStorage:", error)
       }
+    } catch (error) {
+      console.error(error)
     }
   }, [key, storedValue])
 

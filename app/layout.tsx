@@ -3,14 +3,15 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
-import { LanguageProvider } from "@/lib/i18n/use-translation" // Add this import
+import { Toaster } from "@/components/ui/sonner"
+import { LanguageProvider } from "@/lib/i18n/use-translation"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "EduFlow",
-  description: "Personalized learning path generator",
+  title: "EduFlow - Personalized Learning Paths",
+  description:
+    "Discover your personalized learning path with EduFlow. Track your progress, earn points, and unlock new skills!",
     generator: 'v0.dev'
 }
 
@@ -24,11 +25,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <LanguageProvider>
-            {" "}
-            {/* Wrap with LanguageProvider */}
             {children}
+            <Toaster />
           </LanguageProvider>
-          <Toaster />
         </ThemeProvider>
       </body>
     </html>
