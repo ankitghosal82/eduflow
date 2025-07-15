@@ -1,30 +1,76 @@
-# eduflow
+# 📚 EduFlow
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+**EduFlow** is a beautifully designed educational web platform that helps learners explore curated programming and tech courses with ease. It's a simple, frontend-only website — no logins, no distractions, just pure learning.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/ankit-ghosals-projects/eduflow)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/4456BI7CPQz)
+🌐 **Live Site**: [https://eduflowstudy.me](https://eduflowstudy.me)
 
-## Overview
+---
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## 🎯 What is EduFlow?
 
-## Deployment
+EduFlow is a minimalistic online platform offering handpicked, categorized courses for:
 
-Your project is live at:
+- 📘 Programming (Python, C++, JavaScript, etc.)
+- 🧠 Data Science & Machine Learning
+- 🌐 Web Development
+- ⚙️ Core Computer Science Concepts
+- 🧪 Competitive Programming
 
-**[https://vercel.com/ankit-ghosals-projects/eduflow](https://vercel.com/ankit-ghosals-projects/eduflow)**
+It’s ideal for self-learners, students, and developers who want structured content without the clutter.
 
-## Build your app
+---
 
-Continue building your app on:
+## 🚀 Key Features
 
-**[https://v0.dev/chat/projects/4456BI7CPQz](https://v0.dev/chat/projects/4456BI7CPQz)**
+- ✅ Curated course list with direct links (YouTube, blogs, docs)
+- 🖥️ Fully responsive layout (desktop, tablet, mobile)
+- 🌙 Clean dark/light friendly design
+- 📚 Course cards with descriptions, level tags (Beginner, Intermediate, Advanced)
+- 🔍 Searchable and filterable (optional upgrade)
+- 🧾 No login/signup — immediate access to content
+- 📂 100% frontend-based (HTML, CSS, JavaScript)
 
-## How It Works
+---
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+## 🧭 Course Categories (Sample)
+
+### 🧑‍💻 Programming Languages
+- Python Full Course – Beginner to Advanced
+- C++ DSA Crash Course
+- JavaScript DOM and Projects
+
+### 📊 Data Science & ML
+- Python for Data Analysis
+- Machine Learning Roadmap
+- Projects with Scikit-learn & Pandas
+
+### 💻 Web Development
+- HTML + CSS for Beginners
+- JavaScript Projects
+- Frontend Roadmap
+
+### 🏁 Competitive Programming
+- CP Essentials in C++
+- Dynamic Programming Playlist
+- Leetcode, Codeforces Guides
+
+---
+
+## 🖼️ Preview
+
+![EduFlow Screenshot](./preview.png) <!-- Add a real image if available -->
+
+---
+
+## 🛠️ Tech Stack
+
+| Tech         | Description                    |
+|--------------|--------------------------------|
+| HTML/CSS     | Page structure & styling       |
+| JavaScript   | Interactive UI & logic         |
+| Optional     | Tailwind CSS or Bootstrap for design layout |
+
+---
+
+## 📁 Folder Structure
+
